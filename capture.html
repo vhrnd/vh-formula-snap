@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capture Screen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Completely transparent by default */
+            background: transparent;
+            cursor: crosshair;
+            user-select: none;
+        }
+
+        #capture-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Start transparent, darken when selecting */
+            background: transparent;
+            transition: background 0.15s ease;
+            z-index: 1;
+        }
+
+        #capture-overlay.selecting {
+            /* Semi-transparent when user is selecting */
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        #selection-box {
+            position: fixed;
+            border: 2px solid #6366f1;
+            background: rgba(99, 102, 241, 0.15);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+            display: none;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #selection-box::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+        }
+
+        .size-indicator {
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'SF Mono', Monaco, monospace;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .instruction {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .instruction kbd {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 3px 8px;
+            border-radius: 5px;
+            margin: 0 3px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="capture-overlay"></div>
+    <div id="selection-box">
+        <div class="size-indicator" id="size-indicator"></div>
+    </div>
+    <div class="instruction">
+        Drag to select capture area • <kbd>Esc</kbd> to cancel
+    </div>
+    <script type="module" src="/src/capture.ts"></script>
+</body>
+
+</html>

@@ -1,0 +1,218 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* VuiHoc Brand Colors */
+:root {
+    /* Primary colors */
+    --vh-primary: #8AC449;
+    --vh-primary-hover: #7AB839;
+    --vh-primary-light: #E8F5D9;
+
+    /* Accent colors */
+    --vh-accent: #FF6609;
+    --vh-accent-hover: #E85A08;
+    --vh-accent-light: #FFF0E6;
+
+    /* Background */
+    --vh-bg-primary: #F8F9FD;
+    --vh-bg-secondary: #FFFFFF;
+    --vh-bg-card: #FFFFFF;
+
+    /* Text */
+    --vh-text-primary: #2D3748;
+    --vh-text-secondary: #718096;
+    --vh-text-muted: #A0AEC0;
+
+    /* Borders */
+    --vh-border: #E2E8F0;
+    --vh-border-light: #EDF2F7;
+
+    /* Status colors */
+    --vh-success: #8AC449;
+    --vh-error: #E53E3E;
+    --vh-warning: #FF6609;
+    --vh-info: #3182CE;
+}
+
+/* Base styles */
+@layer base {
+    html {
+        font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: var(--vh-bg-primary);
+        color: var(--vh-text-primary);
+    }
+
+    body {
+        @apply antialiased;
+        min-height: 100vh;
+    }
+
+    #root {
+        min-height: 100vh;
+    }
+
+    /* Electron Window Controls */
+    .app-drag {
+        -webkit-app-region: drag;
+    }
+
+    .app-no-drag {
+        -webkit-app-region: no-drag;
+    }
+}
+
+/* Custom scrollbar */
+@layer components {
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--vh-bg-secondary);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--vh-border);
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--vh-text-muted);
+    }
+
+    /* Card styles - VuiHoc style */
+    .card {
+        @apply rounded-xl shadow-lg;
+        background: var(--vh-bg-card);
+        border: 1px solid var(--vh-border-light);
+    }
+
+    /* Button base */
+    .btn {
+        @apply px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 ease-out;
+        @apply disabled:opacity-50 disabled:cursor-not-allowed;
+        @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+        font-family: 'Quicksand', sans-serif;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--vh-primary) 0%, #7AB839 100%);
+        color: white;
+        @apply shadow-md;
+        @apply hover:shadow-lg hover:-translate-y-0.5;
+        @apply focus:ring-green-400;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #7AB839 0%, #6AA82F 100%);
+    }
+
+    .btn-accent {
+        background: linear-gradient(135deg, var(--vh-accent) 0%, #E85A08 100%);
+        color: white;
+        @apply shadow-md;
+        @apply hover:shadow-lg hover:-translate-y-0.5;
+        @apply focus:ring-orange-400;
+    }
+
+    .btn-secondary {
+        background: var(--vh-bg-secondary);
+        color: var(--vh-text-primary);
+        border: 1.5px solid var(--vh-border);
+        @apply hover:border-gray-400 hover:bg-gray-50;
+        @apply focus:ring-gray-400;
+    }
+
+    .btn-ghost {
+        color: var(--vh-text-secondary);
+        @apply hover:bg-gray-100 hover:text-gray-700;
+        @apply focus:ring-gray-400;
+    }
+
+    /* Status badge */
+    .status-badge {
+        @apply px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide;
+    }
+
+    .status-idle {
+        background: var(--vh-bg-secondary);
+        color: var(--vh-text-secondary);
+        border: 1.5px solid var(--vh-border);
+    }
+
+    .status-loading {
+        background: var(--vh-accent-light);
+        color: var(--vh-accent);
+        border: 1.5px solid var(--vh-accent);
+    }
+
+    .status-success {
+        background: var(--vh-primary-light);
+        color: #5A8E2F;
+        border: 1.5px solid var(--vh-primary);
+    }
+
+    .status-error {
+        background: #FED7D7;
+        color: #C53030;
+        border: 1.5px solid #FC8181;
+    }
+}
+
+/* KaTeX customization */
+.katex {
+    color: var(--vh-text-primary);
+    font-size: 2.5em;
+    /* Increased from 1.2em */
+    line-height: 1.2;
+}
+
+.katex-display {
+    margin: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 1rem 0;
+}
+
+/* Hide MathML output to prevent duplicates */
+.katex-mathml {
+    display: none !important;
+}
+
+/* Textarea styling */
+textarea {
+    background: var(--vh-bg-primary);
+    border: 1.5px solid var(--vh-border);
+    color: var(--vh-text-primary);
+    @apply rounded-xl;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+textarea:focus {
+    border-color: var(--vh-primary);
+    @apply ring-2 ring-green-200;
+}
+
+/* Animation */
+@keyframes pulse-soft {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+}
