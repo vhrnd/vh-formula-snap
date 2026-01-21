@@ -47,22 +47,22 @@
       "target": [
         "dmg",
         "zip"
-      ],
-      "icon": "public/icon.icns"
+      ]
     },
     "win": {
       "target": [
         "nsis",
         "portable"
       ],
-      "icon": "public/icon.ico"
+      "signingHashAlgorithms": ["sha256"],
+      "signAndEditExecutable": false,
+      "sign": null
     },
     "linux": {
       "target": [
         "AppImage",
         "deb"
-      ],
-      "icon": "public/icon.png"
+      ]
     }
   }
 }
