@@ -109,6 +109,26 @@ function App() {
         reader.readAsDataURL(file);
     }, []);
 
+    useEffect(() => {
+        const handlePaste = (e: ClipboardEvent) => {
+            const items = e.clipboardData?.items;
+            if (!items) return;
+
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    if (file) {
+                        handleImageUpload(file);
+                    }
+                    break;
+                }
+            }
+        };
+
+        window.addEventListener('paste', handlePaste);
+        return () => window.removeEventListener('paste', handlePaste);
+    }, [handleImageUpload]);
+
     return (
         <div className="h-screen bg-[#F8F9FD] flex flex-col overflow-hidden">
             {/* Top Bar */}

@@ -40,18 +40,7 @@ function ImagePanel({ state, imageDataUrl, onSubmit, onImageUpload }: ImagePanel
         }
     };
 
-    const handlePaste = (e: React.ClipboardEvent) => {
-        const items = e.clipboardData.items;
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') !== -1) {
-                const file = items[i].getAsFile();
-                if (file && onImageUpload) {
-                    onImageUpload(file);
-                }
-                break;
-            }
-        }
-    };
+
 
     const handleAreaClick = () => {
         if (!hasImage && !isCapturing && !isLoading) {
@@ -63,7 +52,6 @@ function ImagePanel({ state, imageDataUrl, onSubmit, onImageUpload }: ImagePanel
         <div
             className="card flex flex-col h-full focus:outline-none focus:ring-2 focus:ring-green-100 transition-shadow"
             tabIndex={0}
-            onPaste={handlePaste}
         >
             {/* Header */}
             <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
