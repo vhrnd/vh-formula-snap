@@ -42,6 +42,12 @@
       "dist/**/*",
       "dist-electron/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "build/icon.ico",
+        "to": "icon.ico"
+      }
+    ],
     "mac": {
       "category": "public.app-category.productivity",
       "target": [
@@ -55,7 +61,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "build/icon.png",
+      "icon": "build/icon.ico",
       "signingHashAlgorithms": [
         "sha256"
       ],
@@ -67,7 +73,7 @@
         "AppImage",
         "deb"
       ],
-      "icon": "build/icon.png"
+      "icon": "build/icon.ico"
     }
   }
 }

@@ -16,16 +16,16 @@ function Write-Log {
     Add-Content -Path $logFile -Value $logMessage
 }
 
-Write-Log "🚀 Starting FormulaSnap Build Process..." "Cyan"
+Write-Log "?? Starting FormulaSnap Build Process..." "Cyan"
 
 # Ensure dependencies are installed
 if (-Not (Test-Path "node_modules")) {
-    Write-Log "📦 Installing dependencies..." "Yellow"
+    Write-Log "?? Installing dependencies..." "Yellow"
     npm install 2>&1 | Tee-Object -FilePath $logFile -Append
 }
 
 # Clean previous builds
-Write-Log "🧹 Cleaning previous builds..." "Yellow"
+Write-Log "?? Cleaning previous builds..." "Yellow"
 if (Test-Path "dist") { Remove-Item -Recurse -Force "dist" }
 if (Test-Path "dist-electron") { Remove-Item -Recurse -Force "dist-electron" }
 # Keep release directory for logs, only clean old builds
@@ -43,15 +43,15 @@ Remove-Item Env:WIN_CSC_KEY_PASSWORD -ErrorAction SilentlyContinue
 Remove-Item Env:CSC_KEY_PASSWORD -ErrorAction SilentlyContinue
 
 # Run build
-Write-Log "🔨 Building application..." "Yellow"
+Write-Log "?? Building application..." "Yellow"
 npm run electron:build 2>&1 | Tee-Object -FilePath $logFile -Append
 
 if ($LASTEXITCODE -eq 0) {
-    Write-Log "✅ Build Successful!" "Green"
-    Write-Log "📁 Artifacts are in the 'release' directory." "Green"
-    Write-Log "📝 Build log saved to: $logFile" "Cyan"
+    Write-Log "? Build Successful!" "Green"
+    Write-Log "?? Artifacts are in the 'release' directory." "Green"
+    Write-Log "?? Build log saved to: $logFile" "Cyan"
 } else {
-    Write-Log "❌ Build Failed." "Red"
-    Write-Log "📝 Build log saved to: $logFile" "Yellow"
+    Write-Log "? Build Failed." "Red"
+    Write-Log "?? Build log saved to: $logFile" "Yellow"
     exit 1
 }

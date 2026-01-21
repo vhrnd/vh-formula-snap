@@ -140,7 +140,7 @@ function App() {
             {/* Compact Footer */}
             <footer className="px-4 py-2 border-t border-gray-200 bg-white">
                 <p className="text-xs text-gray-500 text-center">
-                    Phím tắt: <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-mono text-xs">⌘+Shift+S</kbd>
+                    Phím tắt: <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-600 font-mono text-xs">Ctrl+Shift+S hoặc ⌘+Shift+S</kbd>
                 </p>
             </footer>
 
