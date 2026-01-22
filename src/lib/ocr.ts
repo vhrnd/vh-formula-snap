@@ -18,6 +18,8 @@ export class OCR {
     private worker: Worker;
     private listeners: Map<string, (data: any) => void> = new Map();
     private progressCallback?: (data: ProgressInfo) => void;
+    private initPromise: Promise<void> | null = null;
+    private isReady = false;
 
     constructor() {
         this.worker = new Worker(new URL('../workers/ocr.worker.ts', import.meta.url), {
@@ -48,16 +50,25 @@ export class OCR {
         modelConfig: ModelConfig,
         onProgress?: (data: ProgressInfo) => void
     ): Promise<void> {
+        if (this.initPromise) {
+            if (onProgress) {
+                this.progressCallback = onProgress;
+            }
+            return this.initPromise;
+        }
+
         this.progressCallback = onProgress;
 
-        return new Promise((resolve, reject) => {
+        this.initPromise = new Promise((resolve, reject) => {
             // One-time listener for Ready status
             const handleReady = (event: MessageEvent<WorkerMessage>) => {
                 if (event.data.status === WorkerStatus.Ready) {
                     this.worker.removeEventListener('message', handleReady);
+                    this.isReady = true;
                     resolve();
-                } else if (event.data.status === WorkerStatus.Error) {
+                } else if (event.data.status === WorkerStatus.Error && !event.data.key) {
                     this.worker.removeEventListener('message', handleReady);
+                    this.initPromise = null;
                     reject(new Error(event.data.error));
                 }
             };
@@ -68,9 +79,19 @@ export class OCR {
                 model_config: modelConfig,
             });
         });
+
+        return this.initPromise;
     }
 
     public async predict(image: File): Promise<string> {
+        if (!this.isReady) {
+            if (this.initPromise) {
+                await this.initPromise;
+            } else {
+                throw new Error('Model not initialized. Please call init first.');
+            }
+        }
+
         return new Promise((resolve, reject) => {
             const key = crypto.randomUUID();
 

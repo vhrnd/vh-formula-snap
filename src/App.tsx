@@ -22,8 +22,7 @@ function App() {
 
     // Electron listeners are now set up in the effect below that depends on performOCR
 
-    // Initialize model on mount
-    useEffect(() => {
+    const initModel = useCallback(() => {
         if (!modelInitPromise.current) {
             console.log('Initializing OCR model...');
             modelInitPromise.current = ocr.init(
@@ -52,12 +51,27 @@ function App() {
                 console.error('Failed to init model:', err);
                 setToastMessage('Lỗi khởi tạo mô hình: ' + err.message);
                 setShowToast(true);
+                modelInitPromise.current = null;
+                throw err;
             });
         }
+        return modelInitPromise.current ?? Promise.resolve();
     }, []);
+
+    // Initialize model on mount
+    useEffect(() => {
+        void initModel();
+    }, [initModel]);
 
     const performOCR = useCallback(async (file: File | string) => {
         setState('loading');
+        try {
+            await initModel();
+        } catch {
+            setState('error');
+            return;
+        }
+
         try {
             let fileObj: File;
             let dataUrl: string;
@@ -92,7 +106,7 @@ function App() {
             setToastMessage('Không thể nhận dạng công thức: ' + (e instanceof Error ? e.message : String(e)));
             setShowToast(true);
         }
-    }, []);
+    }, [initModel]);
 
     const handleCapture = useCallback(async () => {
         if (isElectron && window.electronAPI) {
