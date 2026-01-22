@@ -61,16 +61,18 @@ function LatexPanel({ state, latex, onLatexChange }: LatexPanelProps) {
                         Xem trước
                     </h2>
                 </div>
-                <div className="flex-1 p-2 flex items-center justify-center overflow-auto bg-gray-50/30">
+                <div className="flex-1 p-4 bg-gray-50/30 grid place-items-center overflow-hidden">
                     {isLoading ? (
                         <div className="text-gray-500 flex flex-col items-center gap-2">
                             <Loader2 className="w-5 h-5 animate-spin text-[#FF6609]" />
                             <span className="text-xs font-medium">Đang tạo xem trước…</span>
                         </div>
                     ) : latex ? (
-                        <LatexPreview latex={latex} onError={(err) => setLatexError(err)} />
+                        <div className="max-w-full max-h-full overflow-auto scrollbar-hidden">
+                            <LatexPreview latex={latex} onError={(err) => setLatexError(err)} />
+                        </div>
                     ) : (
-                        <div className="text-gray-400 text-center">
+                        <div className="text-gray-400 flex flex-col items-center justify-center">
                             <Eye className="w-8 h-8 mx-auto mb-1.5 opacity-50" />
                             <p className="text-xs">Công thức sẽ hiển thị ở đây</p>
                         </div>

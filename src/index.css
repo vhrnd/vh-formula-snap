@@ -87,6 +87,15 @@
         background: var(--vh-text-muted);
     }
 
+    /* Hide scrollbar but allow scrolling */
+    .scrollbar-hidden {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+
     /* Card styles - VuiHoc style */
     .card {
         @apply rounded-xl shadow-lg;
@@ -176,9 +185,13 @@
 
 .katex-display {
     margin: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
+    overflow: visible;
     padding: 1rem 0;
+}
+
+.katex-display > .katex {
+    white-space: normal;
+    text-align: center;
 }
 
 /* Hide MathML output to prevent duplicates */
