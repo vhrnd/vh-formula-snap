@@ -97,9 +97,11 @@ const predict = async (imageFile: File) => {
     const text = tokenizer.batch_decode(outputs as any, { skip_special_tokens: true })[0];
 
     // Post-processing: remove negative space characters (\!) and normalize spaces
-    // Replacing \! with empty string
-    // if ":" in text, replace with "" and "~", "," with ""
-    return text.replace(/\\!/g, '').replace(/\s+/g, '').replace(/:/g, '').replace(/,/g, '').trim();
+    // Replacing \! with empty string, remove all whitespace (aggressive compaction for Word)
+    let cleaned = text.replace(/\\!/g, '').replace(/\s+/g, '');
+
+    // Rule: Remove characters : , ~ only if they appear at the start or end of the string
+    return cleaned.replace(/^[:~,]+|[:~,]+$/g, '');
 };
 
 self.onmessage = async (event: MessageEvent) => {
