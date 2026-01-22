@@ -1,15 +1,15 @@
 import React, { useRef } from 'react';
-import { ImageIcon, Loader2, Send } from 'lucide-react';
+import { ImageIcon, Loader2 } from 'lucide-react';
 import { AppState } from '../types';
 
 interface ImagePanelProps {
     state: AppState;
     imageDataUrl?: string;
-    onSubmit?: () => void;
+
     onImageUpload?: (file: File) => void;
 }
 
-function ImagePanel({ state, imageDataUrl, onSubmit, onImageUpload }: ImagePanelProps) {
+function ImagePanel({ state, imageDataUrl, onImageUpload }: ImagePanelProps) {
     const isLoading = state === 'loading';
     const isCapturing = state === 'capturing';
     const isCaptured = state === 'captured';
@@ -54,26 +54,18 @@ function ImagePanel({ state, imageDataUrl, onSubmit, onImageUpload }: ImagePanel
             tabIndex={0}
         >
             {/* Header */}
-            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
                 <h2 className="text-xs font-bold text-gray-600 uppercase tracking-wide flex items-center gap-2">
                     <ImageIcon className="w-3.5 h-3.5 text-[#8AC449]" />
                     Hình ảnh
                 </h2>
 
-                {isCaptured && hasImage && onSubmit && (
-                    <button
-                        onClick={onSubmit}
-                        className="btn btn-accent flex items-center gap-1.5 text-xs py-1.5 px-3"
-                    >
-                        <Send className="w-3.5 h-3.5" />
-                        <span>Nhận dạng</span>
-                    </button>
-                )}
+
             </div>
 
             {/* Content */}
             <div
-                className={`flex-1 p-4 flex items-center justify-center bg-gray-50/50 relative overflow-hidden
+                className={`flex-1 p-2 flex items-center justify-center bg-gray-50/50 relative overflow-hidden
                            ${!hasImage ? 'cursor-pointer hover:bg-gray-100/50 transition-colors' : ''}`}
                 onDragOver={handleDragOver}
                 onDrop={handleDrop}
@@ -114,7 +106,7 @@ function ImagePanel({ state, imageDataUrl, onSubmit, onImageUpload }: ImagePanel
 
                         {isCaptured && (
                             <p className="text-xs text-gray-500">
-                                Bấm <span className="text-[#FF6609] font-semibold">Nhận dạng</span> để chuyển sang LaTeX
+                                Đang tự động nhận dạng...
                             </p>
                         )}
                         <button
@@ -139,10 +131,8 @@ function ImagePanel({ state, imageDataUrl, onSubmit, onImageUpload }: ImagePanel
                                     className="text-xs px-3 py-1 bg-white border border-gray-200 rounded-md shadow-sm hover:text-[#8AC449]"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        if (onSubmit) { // Using this as 'Capture' trigger is confusing if onSubmit is recognition.
-                                            // The user should press TopBar Capture button for screenshot.
-                                            // Here we just guide.
-                                        }
+                                        // The user should press TopBar Capture button for screenshot.
+                                        // Here we just guide.
                                     }}
                                 >
                                     Hoặc bấm <b>Chụp</b> ở trên

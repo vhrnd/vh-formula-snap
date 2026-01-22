@@ -1,10 +1,12 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppState, Result, CapturedImage } from './types';
-import { mockRecognizeLatex, mockCaptureAndRecognize } from './mock';
+import { mockCaptureAndRecognize } from './mock';
+import { ocr } from './lib/ocr';
 import TopBar from './components/TopBar';
 import ImagePanel from './components/ImagePanel';
 import LatexPanel from './components/LatexPanel';
 import Toast from './components/Toast';
+import ModelLoadingOverlay from './components/ModelLoadingOverlay';
 
 const isElectron = !!window.electronAPI;
 
@@ -15,17 +17,80 @@ function App() {
     const [latex, setLatex] = useState<string>('');
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
+    const [progress, setProgress] = useState<{ status: string; percent: number } | null>(null);
+    const modelInitPromise = useRef<Promise<void> | null>(null);
 
+    // Electron listeners are now set up in the effect below that depends on performOCR
+
+    // Initialize model on mount
     useEffect(() => {
-        if (isElectron && window.electronAPI) {
-            window.electronAPI.onCaptureResult?.((imageDataUrl: string) => {
-                setCapturedImage({ imageDataUrl });
-                setState('captured');
+        if (!modelInitPromise.current) {
+            console.log('Initializing OCR model...');
+            modelInitPromise.current = ocr.init(
+                {
+                    modelName: 'tiennguyenbnbk/formulasnap',
+                    env: {
+                        remoteHost: 'https://huggingface.co/',
+                        remotePathTemplate: '{model}/resolve/{revision}'
+                    }
+                },
+                (data) => {
+                    console.log('Model loading progress:', data);
+                    if (data.status === 'initiate') {
+                        setProgress({ status: 'Initiating...', percent: 0 });
+                    } else if (data.status === 'download') {
+                        // Estimate total progress if multiple files
+                        setProgress({
+                            status: `Downloading ${data.file}...`,
+                            percent: data.progress || 0
+                        });
+                    } else if (data.status === 'done') {
+                        setProgress(null);
+                    }
+                }
+            ).catch(err => {
+                console.error('Failed to init model:', err);
+                setToastMessage('Lỗi khởi tạo mô hình: ' + err.message);
+                setShowToast(true);
             });
+        }
+    }, []);
 
-            window.electronAPI.onCaptureCancelled?.(() => {
-                setState('idle');
-            });
+    const performOCR = useCallback(async (file: File | string) => {
+        setState('loading');
+        try {
+            let fileObj: File;
+            let dataUrl: string;
+
+            if (typeof file === 'string') {
+                dataUrl = file;
+                const res = await fetch(file);
+                const blob = await res.blob();
+                fileObj = new File([blob], "capture.png", { type: "image/png" });
+            } else {
+                fileObj = file;
+                dataUrl = await new Promise<string>((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target?.result as string);
+                    reader.readAsDataURL(fileObj);
+                });
+            }
+
+            setCapturedImage({ imageDataUrl: dataUrl });
+            // Clear previous result while loading
+            setResult(null);
+            setLatex('');
+
+            const latexResult = await ocr.predict(fileObj);
+
+            setResult({ imageDataUrl: dataUrl, latex: latexResult });
+            setLatex(latexResult);
+            setState('success');
+        } catch (e) {
+            console.error(e);
+            setState('error');
+            setToastMessage('Không thể nhận dạng công thức: ' + (e instanceof Error ? e.message : String(e)));
+            setShowToast(true);
         }
     }, []);
 
@@ -39,34 +104,42 @@ function App() {
                 setShowToast(true);
             }
         } else {
+            // Mock capture
             setState('loading');
             try {
                 const data = await mockCaptureAndRecognize();
-                setCapturedImage({ imageDataUrl: data.imageDataUrl });
-                setResult(data);
-                setLatex(data.latex);
-                setState('success');
+                // For mock, we pretend we got a file back or just use the mock result directly
+                // But to be consistent with "auto-submit", we should run OCR if possible.
+                // However, mockCaptureAndRecognize returns a result directly.
+                // Let's just use the mock result for non-Electron dev mode to save time/complexity
+                // or if we really want to test the model in browser dev mode, we should fetch the image.
+
+                // If we want to test REAL model in browser with mock capture:
+                performOCR(data.imageDataUrl);
             } catch {
                 setState('error');
             }
         }
-    }, []);
+    }, [performOCR]);
 
-    const handleSubmit = useCallback(async () => {
-        if (!capturedImage) return;
+    // Handle Electron capture result
+    useEffect(() => {
+        if (isElectron && window.electronAPI) {
+            // Check if onCaptureResult is a property we can set (it depends on how preload exposes it)
+            // If it is exposed as a function to register a listener, we should use that.
+            // Based on previous code: window.electronAPI.onCaptureResult?.(...) it seems it was a function to register a callback?
+            // Let's check preload.ts via view_file if this fails, but for now assuming it was a listener registration function.
+            // The previous code was: window.electronAPI.onCaptureResult?.((imageDataUrl) => { ... })
 
-        setState('loading');
-        try {
-            const latexResult = await mockRecognizeLatex(capturedImage.imageDataUrl);
-            setResult({ imageDataUrl: capturedImage.imageDataUrl, latex: latexResult });
-            setLatex(latexResult);
-            setState('success');
-        } catch {
-            setState('error');
-            setToastMessage('Không thể nhận dạng công thức');
-            setShowToast(true);
+            window.electronAPI.onCaptureResult?.((imageDataUrl: string) => {
+                performOCR(imageDataUrl);
+            });
+
+            window.electronAPI.onCaptureCancelled?.(() => {
+                setState('idle');
+            });
         }
-    }, [capturedImage]);
+    }, [performOCR]);
 
     const handleCopyLatex = useCallback(async () => {
         if (!latex) return;
@@ -96,18 +169,8 @@ function App() {
     }, []);
 
     const handleImageUpload = useCallback((file: File) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const dataUrl = e.target?.result as string;
-            if (dataUrl) {
-                setCapturedImage({ imageDataUrl: dataUrl });
-                setState('captured');
-                setResult(null);
-                setLatex('');
-            }
-        };
-        reader.readAsDataURL(file);
-    }, []);
+        performOCR(file);
+    }, [performOCR]);
 
     useEffect(() => {
         const handlePaste = (e: ClipboardEvent) => {
@@ -141,12 +204,18 @@ function App() {
             />
 
             {/* Main Content - Compact */}
-            <main className="flex-1 p-4 overflow-hidden">
-                <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <main className="flex-1 p-2 overflow-hidden relative">
+                <ModelLoadingOverlay
+                    isVisible={!!progress}
+                    status={progress?.status || ''}
+                    percent={progress?.percent}
+                    fileName={progress?.status.includes('Downloading') ? progress.status.replace('Downloading ', '').replace('...', '') : undefined}
+                />
+
+                <div className="h-full grid grid-cols-1 lg:grid-cols-2 gap-2">
                     <ImagePanel
                         state={state}
                         imageDataUrl={capturedImage?.imageDataUrl || result?.imageDataUrl}
-                        onSubmit={handleSubmit}
                         onImageUpload={handleImageUpload}
                     />
                     <LatexPanel

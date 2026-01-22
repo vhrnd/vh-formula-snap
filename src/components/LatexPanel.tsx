@@ -22,16 +22,16 @@ function LatexPanel({ state, latex, onLatexChange }: LatexPanelProps) {
     }, [latex]);
 
     return (
-        <div className="flex flex-col gap-3 h-full">
+        <div className="flex flex-col gap-2 h-full">
             {/* LaTeX Editor */}
             <div className="card flex flex-col flex-1">
-                <div className="px-4 py-3 border-b border-gray-100">
+                <div className="px-3 py-2 border-b border-gray-100">
                     <h2 className="text-xs font-bold text-gray-600 uppercase tracking-wide flex items-center gap-2">
                         <Code2 className="w-3.5 h-3.5 text-[#8AC449]" />
                         Mã LaTeX
                     </h2>
                 </div>
-                <div className="flex-1 p-3">
+                <div className="flex-1 p-2">
                     {isLoading ? (
                         <div className="h-full flex items-center justify-center text-gray-500">
                             <div className="flex flex-col items-center gap-2">
@@ -55,13 +55,13 @@ function LatexPanel({ state, latex, onLatexChange }: LatexPanelProps) {
 
             {/* LaTeX Preview */}
             <div className="card flex flex-col flex-1">
-                <div className="px-4 py-3 border-b border-gray-100">
+                <div className="px-3 py-2 border-b border-gray-100">
                     <h2 className="text-xs font-bold text-gray-600 uppercase tracking-wide flex items-center gap-2">
                         <Eye className="w-3.5 h-3.5 text-[#FF6609]" />
                         Xem trước
                     </h2>
                 </div>
-                <div className="flex-1 p-3 flex items-center justify-center overflow-auto bg-gray-50/30">
+                <div className="flex-1 p-2 flex items-center justify-center overflow-auto bg-gray-50/30">
                     {isLoading ? (
                         <div className="text-gray-500 flex flex-col items-center gap-2">
                             <Loader2 className="w-5 h-5 animate-spin text-[#FF6609]" />
