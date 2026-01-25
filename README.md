@@ -39,7 +39,7 @@ FormulaSnap sử dụng model [**Texo**](https://github.com/alephpi/Texo) - mộ
 1. **Clone repository:**
    ```bash
    git clone <repository-url>
-   cd FormulaSnap
+   cd vh-formula-snap
    ```
 
 2. **Cài đặt dependencies:**
@@ -99,4 +99,4 @@ FormulaSnap/
 
 ## 📄 License
 
-MIT License - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+Apache License 2.0 - Xem file [LICENSE](LICENSE) để biết thêm chi tiết.
