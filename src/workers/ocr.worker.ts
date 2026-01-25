@@ -6,6 +6,8 @@ import {
     env,
 } from '@huggingface/transformers';
 import { preprocessImg } from './imageProcessor';
+import { normalizeLatex } from '../utils/latex';
+
 
 // Configure environment
 env.allowLocalModels = false;
@@ -97,11 +99,8 @@ const predict = async (imageFile: File) => {
     const text = tokenizer.batch_decode(outputs as any, { skip_special_tokens: true })[0];
 
     // Post-processing: remove negative space characters (\!) and normalize spaces
-    // Replacing \! with empty string, remove all whitespace (aggressive compaction for Word)
-    let cleaned = text.replace(/\\!/g, '').replace(/\s+/g, '');
-
-    // Rule: Remove characters : , ~ only if they appear at the start or end of the string
-    return cleaned.replace(/^[:~,]+|[:~,]+$/g, '');
+    // Use our smart normalization utility
+    return normalizeLatex(text);
 };
 
 self.onmessage = async (event: MessageEvent) => {
