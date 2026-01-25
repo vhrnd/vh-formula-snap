@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { AppState, Result, CapturedImage } from './types';
-import { mockCaptureAndRecognize } from './mock';
 import { ocr } from './lib/ocr';
 import TopBar from './components/TopBar';
 import ImagePanel from './components/ImagePanel';
@@ -118,23 +117,11 @@ function App() {
                 setShowToast(true);
             }
         } else {
-            // Mock capture
-            setState('loading');
-            try {
-                const data = await mockCaptureAndRecognize();
-                // For mock, we pretend we got a file back or just use the mock result directly
-                // But to be consistent with "auto-submit", we should run OCR if possible.
-                // However, mockCaptureAndRecognize returns a result directly.
-                // Let's just use the mock result for non-Electron dev mode to save time/complexity
-                // or if we really want to test the model in browser dev mode, we should fetch the image.
-
-                // If we want to test REAL model in browser with mock capture:
-                performOCR(data.imageDataUrl);
-            } catch {
-                setState('error');
-            }
+            // Non-Electron (Browser) Mode
+            setToastMessage('Chức năng chụp màn hình chỉ hoạt động trên ứng dụng máy tính (Electron).');
+            setShowToast(true);
         }
-    }, [performOCR]);
+    }, []);
 
     // Handle Electron capture result
     useEffect(() => {
